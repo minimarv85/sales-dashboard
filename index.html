@@ -29,6 +29,23 @@
         .dashboard { display: none; }
         .dashboard.active { display: block; }
         
+        .header-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn-reset {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
         .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
         .stat { background: white; padding: 20px; border-radius: 12px; border: 1px solid #eee; }
         .stat h3 { color: #666; font-size: 14px; margin-bottom: 8px; }
@@ -45,41 +62,107 @@
         .bar-fill { height: 100%; background: #2563EB; border-radius: 4px; transition: width 0.3s; }
         .bar-value { width: 80px; text-align: right; font-size: 12px; font-weight: 500; }
         
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f8f8f8; font-size: 12px; color: #666; text-transform: uppercase; }
-        
-        .status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-        .status.live { background: #d1fae5; color: #059669; }
-        .status.quotation { background: #dbeafe; color: #2563EB; }
-        .status.awaiting { background: #fef3c7; color: #d97706; }
-        .status.completed { background: #ede9fe; color: #7c3aed; }
-        .status.lost { background: #fee2e2; color: #dc2626; }
-        
-        .filters { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-        .filters input, .filters select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-        .filters input { flex: 1; min-width: 200px; }
-        
         .leadgen-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
-        .leadgen-card { background: #f8f8f8; padding: 16px; border-radius: 8px; }
+        .leadgen-card { background: #f8f8f8; padding: 16px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .leadgen-card:hover { background: #e8e8ff; transform: translateY(-2px); }
+        .leadgen-card.selected { background: #dbeafe; border: 2px solid #2563EB; }
         .leadgen-card .name { font-weight: 600; margin-bottom: 4px; }
         .leadgen-card .value { font-size: 20px; font-weight: bold; color: #2563EB; }
         .leadgen-card .stats { font-size: 12px; color: #666; }
+        
+        .filters-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            margin-bottom: 30px;
+        }
+        
+        .filters-section h3 { margin-bottom: 16px; }
+        
+        .filters-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .filters-row label { font-size: 14px; color: #666; }
+        .filters-row input, .filters-row select {
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+        .filters-row input[type="date"] { width: 160px; }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .project-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .project-card:hover { border-color: #2563EB; transform: translateY(-2px); }
+        .project-card h4 { margin-bottom: 8px; color: #333; }
+        .project-card .client { font-size: 14px; color: #666; margin-bottom: 8px; }
+        .project-card .details { display: flex; justify-content: space-between; align-items: center; }
+        .project-card .value { font-size: 18px; font-weight: bold; color: #10B981; }
+        .project-card .status { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .project-card .status.live { background: #d1fae5; color: #059669; }
+        .project-card .status.quotation { background: #dbeafe; color: #2563EB; }
+        .project-card .status.awaiting { background: #fef3c7; color: #d97706; }
+        .project-card .status.completed { background: #ede9fe; color: #7c3aed; }
+        .project-card .status.lost { background: #fee2e2; color: #dc2626; }
+        .project-card .date { font-size: 12px; color: #999; }
+        
+        .load-more {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-top: 20px;
+            background: #2563EB;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .load-more:hover { background: #1D4ED8; }
+        .load-more:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .count-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+        
+        .no-projects {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <h1>📊 Sales Pipeline Dashboard</h1>
     <p class="subtitle">Upload your sales CSV to analyze performance</p>
     
-    <form id="upload-form">
-        <div class="upload-zone" onclick="document.getElementById('file-input').click()">
-            <h2>📁 Click to Select CSV File</h2>
-            <p>or drag and drop file here</p>
-        </div>
-        <input type="file" id="file-input" name="file" accept=".csv">
-    </form>
+    <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+        <h2>📁 Click to Select CSV File</h2>
+        <p>or drag and drop file here</p>
+    </div>
+    <input type="file" id="file-input" accept=".csv">
     
     <div class="dashboard" id="dashboard">
+        <div class="header-row">
+            <h2>Pipeline Overview</h2>
+            <button class="btn-reset" onclick="resetDashboard()">📤 Upload New File</button>
+        </div>
+        
         <div class="stats">
             <div class="stat">
                 <h3>Total Pipeline Value</h3>
@@ -111,66 +194,62 @@
         </div>
         
         <div class="chart" style="margin-bottom: 30px;">
-            <h3>Lead Generator Performance</h3>
+            <h3>Lead Generator Performance (click to filter)</h3>
             <div class="leadgen-cards" id="leadgen-cards"></div>
         </div>
         
-        <div class="chart">
-            <h3>Pipeline Details</h3>
-            <div class="filters">
-                <input type="text" id="search" placeholder="Search by client or reference...">
-                <select id="status-filter">
+        <div class="filters-section">
+            <h3>🔍 Filter Projects</h3>
+            <div class="filters-row">
+                <label>Date From:</label>
+                <input type="date" id="date-from" onchange="applyFilters()">
+                
+                <label>Date To:</label>
+                <input type="date" id="date-to" onchange="applyFilters()">
+                
+                <label>Status:</label>
+                <select id="status-filter" onchange="applyFilters()">
                     <option value="">All Statuses</option>
                     <option value="Live">Live</option>
                     <option value="Quotation Produced">Quotation Produced</option>
                     <option value="Awaiting Quotation">Awaiting Quotation</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Client Lost Lead">Lost Lead</option>
                 </select>
-                <select id="leadgen-filter">
+                
+                <label>Lead Gen:</label>
+                <select id="leadgen-filter" onchange="applyFilters()">
                     <option value="">All Lead Gens</option>
                 </select>
+                
+                <button onclick="clearFilters()" style="padding: 10px 16px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer;">Clear</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Reference</th>
-                        <th>Client</th>
-                        <th>Value</th>
-                        <th>Status</th>
-                        <th>Lead Gen</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body"></tbody>
-            </table>
         </div>
+        
+        <p class="count-label" id="count-label">Showing 0 projects</p>
+        
+        <div class="projects-grid" id="projects-grid"></div>
+        
+        <button class="load-more" id="load-more" onclick="loadMore()">Load More Projects</button>
     </div>
     
     <script>
         var csvData = [];
-        var fileInput = document.getElementById('file-input');
-        var dashboard = document.getElementById('dashboard');
-        var uploadForm = document.getElementById('upload-form');
+        var filteredData = [];
+        var displayedCount = 0;
+        var pageSize = 10;
+        var selectedLeadGen = '';
         
-        // Handle file selection
-        fileInput.addEventListener('change', function(e) {
+        document.getElementById('file-input').addEventListener('change', function(e) {
             var file = e.target.files[0];
-            if (file) {
-                processFile(file);
-            }
+            if (file) processFile(file);
         });
         
-        // Handle drag and drop
-        document.body.addEventListener('dragover', function(e) {
-            e.preventDefault();
-        });
-        
+        document.body.addEventListener('dragover', function(e) { e.preventDefault(); });
         document.body.addEventListener('drop', function(e) {
             e.preventDefault();
             var file = e.dataTransfer.files[0];
-            if (file && file.name.toLowerCase().endsWith('.csv')) {
-                processFile(file);
-            } else {
-                alert('Please drop a CSV file');
-            }
+            if (file) processFile(file);
         });
         
         function processFile(file) {
@@ -193,17 +272,20 @@
                         if (row.Reference) csvData.push(row);
                     }
                     
-                    // Show dashboard
-                    uploadForm.style.display = 'none';
-                    dashboard.classList.add('active');
+                    // Sort by date created (newest first)
+                    csvData.sort(function(a, b) {
+                        var dateA = new Date(a['Date Created'] || '01/01/1970');
+                        var dateB = new Date(b['Date Created'] || '01/01/1970');
+                        return dateB - dateA;
+                    });
+                    
+                    document.querySelector('.upload-zone').style.display = 'none';
+                    document.getElementById('dashboard').classList.add('active');
                     
                     updateDashboard();
                 } catch (err) {
                     alert('Error: ' + err.message);
                 }
-            };
-            reader.onerror = function() {
-                alert('Error reading file');
             };
             reader.readAsText(file);
         }
@@ -214,14 +296,11 @@
             var inQuotes = false;
             for (var i = 0; i < line.length; i++) {
                 var char = line[i];
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === ',' && !inQuotes) {
+                if (char === '"') inQuotes = !inQuotes;
+                else if (char === ',' && !inQuotes) {
                     result.push(current);
                     current = '';
-                } else {
-                    current += char;
-                }
+                } else current += char;
             }
             result.push(current);
             return result;
@@ -234,24 +313,20 @@
             var statusData = {};
             var leadgenData = {};
             
-            for (var i = 0; i < csvData.length; i++) {
-                var row = csvData[i];
+            csvData.forEach(function(row) {
                 var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
                 var status = row.Status || 'Unknown';
                 var lg = row['Lead Generator'] || 'Unknown';
                 
                 if (value > 0) totalValue += value;
-                
                 if (status === 'Live' || status === 'Completed') completedCount++;
-                if (status !== 'Completed' && status !== 'Client Lost Lead' && status !== 'Lost Lead') activeCount++;
+                if (!['Completed', 'Client Lost Lead', 'Lost Lead', 'Declined to Tender', 'Order Cancelled'].includes(status)) activeCount++;
                 
-                if (!statusData[status]) statusData[status] = 0;
-                statusData[status]++;
-                
+                statusData[status] = (statusData[status] || 0) + value;
                 if (!leadgenData[lg]) leadgenData[lg] = { count: 0, value: 0 };
                 leadgenData[lg].count++;
                 leadgenData[lg].value += value;
-            }
+            });
             
             var winRate = activeCount > 0 ? ((completedCount / activeCount) * 100).toFixed(1) : 0;
             var avgDeal = completedCount > 0 ? (totalValue / completedCount) : 0;
@@ -261,11 +336,11 @@
             document.getElementById('win-rate').textContent = winRate + '%';
             document.getElementById('avg-deal').textContent = '£' + Math.round(avgDeal).toLocaleString();
             
-            renderBarChart('status-chart', statusData, false);
+            renderBarChart('status-chart', statusData);
             renderBarChart('leadgen-chart', leadgenData, true);
             renderLeadgenCards(leadgenData);
-            renderTable(csvData);
             populateLeadgenFilter(leadgenData);
+            applyFilters();
         }
         
         function renderBarChart(containerId, data, isValue) {
@@ -293,32 +368,29 @@
             }).sort(function(a, b) { return b.value - a.value; });
             
             container.innerHTML = entries.map(function(e) {
-                return '<div class="leadgen-card">' +
+                var selected = selectedLeadGen === e.name ? 'selected' : '';
+                return '<div class="leadgen-card ' + selected + '" onclick="selectLeadGen(\'' + e.name.replace(/'/g, "\\'") + '\')">' +
                     '<div class="name">' + e.name + '</div>' +
                     '<div class="value">£' + Math.round(e.value).toLocaleString() + '</div>' +
                     '<div class="stats">' + e.count + ' opportunities</div></div>';
             }).join('');
         }
         
-        function renderTable(data) {
-            var tbody = document.getElementById('table-body');
-            tbody.innerHTML = data.slice(0, 50).map(function(row) {
-                var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
-                var statusClass = '';
-                var status = row.Status || '';
-                if (status.toLowerCase().includes('live')) statusClass = 'live';
-                else if (status.toLowerCase().includes('quotation')) statusClass = 'quotation';
-                else if (status.toLowerCase().includes('awaiting')) statusClass = 'awaiting';
-                else if (status.toLowerCase().includes('completed')) statusClass = 'completed';
-                else if (status.toLowerCase().includes('lost') || status.toLowerCase().includes('declined')) statusClass = 'lost';
-                
-                return '<tr>' +
-                    '<td><strong>' + (row.Reference || '') + '</strong></td>' +
-                    '<td>' + (row.Client || '') + '</td>' +
-                    '<td><strong>' + (value > 0 ? '£' + Math.round(value).toLocaleString() : '-') + '</strong></td>' +
-                    '<td><span class="status ' + statusClass + '">' + status + '</span></td>' +
-                    '<td>' + (row['Lead Generator'] || '') + '</td></tr>';
-            }).join('');
+        function selectLeadGen(name) {
+            selectedLeadGen = selectedLeadGen === name ? '' : name;
+            renderLeadgenCards(getLeadgenData());
+            applyFilters();
+        }
+        
+        function getLeadgenData() {
+            var leadgenData = {};
+            csvData.forEach(function(row) {
+                var lg = row['Lead Generator'] || 'Unknown';
+                if (!leadgenData[lg]) leadgenData[lg] = { count: 0, value: 0 };
+                leadgenData[lg].count++;
+                leadgenData[lg].value += parseFloat(row['Initial Contract Value'] || '0') || 0;
+            });
+            return leadgenData;
         }
         
         function populateLeadgenFilter(data) {
@@ -328,6 +400,92 @@
                 options += '<option value="' + lg + '">' + lg + '</option>';
             });
             select.innerHTML = options;
+        }
+        
+        function applyFilters() {
+            var dateFrom = document.getElementById('date-from').value;
+            var dateTo = document.getElementById('date-to').value;
+            var status = document.getElementById('status-filter').value;
+            var leadgen = document.getElementById('leadgen-filter').value;
+            
+            filteredData = csvData.filter(function(row) {
+                var date = row['Date Created'] || '';
+                var rowDate = date ? new Date(date) : new Date('01/01/1970');
+                var rowDateStr = rowDate.toISOString().split('T')[0];
+                
+                var matchDateFrom = !dateFrom || rowDateStr >= dateFrom;
+                var matchDateTo = !dateTo || rowDateStr <= dateTo;
+                var matchStatus = !status || row.Status === status;
+                var matchLeadgen = !leadgen || row['Lead Generator'] === leadgen;
+                var matchSelectedLeadGen = !selectedLeadGen || row['Lead Generator'] === selectedLeadGen;
+                
+                return matchDateFrom && matchDateTo && matchStatus && matchLeadgen && matchSelectedLeadGen;
+            });
+            
+            displayedCount = 0;
+            renderProjects();
+        }
+        
+        function renderProjects() {
+            var container = document.getElementById('projects-grid');
+            var showCount = Math.min(filteredData.length, displayedCount + pageSize);
+            var projects = filteredData.slice(0, showCount);
+            
+            document.getElementById('count-label').textContent = 'Showing ' + showCount + ' of ' + filteredData.length + ' projects';
+            
+            if (filteredData.length === 0) {
+                container.innerHTML = '<div class="no-projects">No projects match your filters</div>';
+                document.getElementById('load-more').style.display = 'none';
+                return;
+            }
+            
+            container.innerHTML = projects.map(function(row) {
+                var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
+                var statusClass = '';
+                var status = row.Status || '';
+                if (status.toLowerCase().includes('live')) statusClass = 'live';
+                else if (status.toLowerCase().includes('quotation')) statusClass = 'quotation';
+                else if (status.toLowerCase().includes('awaiting')) statusClass = 'awaiting';
+                else if (status.toLowerCase().includes('completed')) statusClass = 'completed';
+                else if (status.toLowerCase().includes('lost') || status.toLowerCase().includes('declined')) statusClass = 'lost';
+                
+                return '<div class="project-card">' +
+                    '<h4>' + (row.Reference || '') + '</h4>' +
+                    '<div class="client">' + (row.Client || '') + '</div>' +
+                    '<div class="details">' +
+                        '<span class="value">' + (value > 0 ? '£' + Math.round(value).toLocaleString() : '-') + '</span>' +
+                        '<span class="status ' + statusClass + '">' + status + '</span>' +
+                    '</div>' +
+                    '<div class="date" style="margin-top: 8px;">Created: ' + (row['Date Created'] || '') + '</div>' +
+                '</div>';
+            }).join('');
+            
+            document.getElementById('load-more').style.display = showCount < filteredData.length ? 'block' : 'none';
+        }
+        
+        function loadMore() {
+            displayedCount += pageSize;
+            renderProjects();
+        }
+        
+        function clearFilters() {
+            document.getElementById('date-from').value = '';
+            document.getElementById('date-to').value = '';
+            document.getElementById('status-filter').value = '';
+            document.getElementById('leadgen-filter').value = '';
+            selectedLeadGen = '';
+            renderLeadgenCards(getLeadgenData());
+            applyFilters();
+        }
+        
+        function resetDashboard() {
+            csvData = [];
+            filteredData = [];
+            displayedCount = 0;
+            selectedLeadGen = '';
+            document.querySelector('.upload-zone').style.display = 'block';
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('file-input').value = '';
         }
     </script>
 </body>
