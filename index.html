@@ -325,7 +325,7 @@
             var leadgenData = {};
             
             csvData.forEach(function(row) {
-                var rawValue = row['Initial Contract Value'] || '0';
+                var rawValue = row['Project Quote Value'] || row['Initial Contract Value'] || '0';
                 var cleanedValue = rawValue.replace(/[^0-9.-]/g, '');
                 var value = parseFloat(cleanedValue) || 0;
                 var status = row.Status || 'Unknown';
@@ -410,7 +410,7 @@
             var leadgenData = {};
             csvData.forEach(function(row) {
                 var lg = row['Lead Generator'] || 'Unknown';
-                var rawValue = row['Initial Contract Value'] || '0';
+                var rawValue = row['Project Quote Value'] || row['Initial Contract Value'] || '0';
                 var cleanedValue = rawValue.replace(/[^0-9.-]/g, '');
                 var value = parseFloat(cleanedValue) || 0;
                 if (!leadgenData[lg]) leadgenData[lg] = { count: 0, value: 0 };
@@ -471,7 +471,7 @@
             var quotationCount = 0;
             var totalPipelineValue = 0;
             filteredData.forEach(function(row) {
-                var rawValue = row['Initial Contract Value'] || '0';
+                var rawValue = row['Project Quote Value'] || row['Initial Contract Value'] || '0';
                 // Clean the value - remove non-numeric characters except digits, decimal point, and minus
                 var cleanedValue = rawValue.replace(/[^0-9.-]/g, '');
                 var value = parseFloat(cleanedValue) || 0;
@@ -496,7 +496,9 @@
             // Total Live Value = sum of all projects (regardless of status) in filtered data
             var totalPipelineValue = 0;
             filteredData.forEach(function(row) {
-                var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
+                var rawValue = row['Project Quote Value'] || row['Initial Contract Value'] || '0';
+                var cleanedValue = rawValue.replace(/[^0-9.-]/g, '');
+                var value = parseFloat(cleanedValue) || 0;
                 if (value > 0) totalPipelineValue += value;
             });
             
@@ -522,7 +524,7 @@
             }
             
             container.innerHTML = projects.map(function(row) {
-                var rawValue = row['Initial Contract Value'] || '0';
+                var rawValue = row['Project Quote Value'] || row['Initial Contract Value'] || '0';
                 var cleanedValue = rawValue.replace(/[^0-9.-]/g, '');
                 var value = parseFloat(cleanedValue) || 0;
                 var statusClass = '';
