@@ -169,7 +169,7 @@
                 <div class="value" id="total-value">£0</div>
             </div>
             <div class="stat">
-                <h3>Active Opportunities</h3>
+                <h3>Live Projects</h3>
                 <div class="value" id="active-count">0</div>
             </div>
             <div class="stat">
@@ -177,7 +177,7 @@
                 <div class="value" id="win-rate">0%</div>
             </div>
             <div class="stat">
-                <h3>Avg Deal Size</h3>
+                <h3>Total Live Value</h3>
                 <div class="value" id="avg-deal">£0</div>
             </div>
         </div>
@@ -460,23 +460,34 @@
             displayedCount = 0;
             
             // Calculate stats based on filtered data
-            var filteredTotal = 0;
-            var filteredLive = 0;
-            var filteredQuotes = 0;
+            var totalLiveValue = 0;
+            var liveProjectCount = 0;
+            var quotationCount = 0;
             filteredData.forEach(function(row) {
                 var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
                 var rowStatus = (row.Status || '').toLowerCase();
-                if (value > 0) filteredTotal += value;
-                if (rowStatus.includes('live')) filteredLive++;
-                if (rowStatus.includes('quotation')) filteredQuotes++;
+                if (value > 0) totalLiveValue += value;
+                if (rowStatus.includes('live')) {
+                    liveProjectCount++;
+                    // Only count Live projects in Live Value
+                }
+                if (rowStatus.includes('quotation')) quotationCount++;
             });
-            var filteredWinRate = filteredQuotes > 0 ? ((filteredLive / filteredQuotes) * 100).toFixed(1) : 0;
-            var filteredAvgDeal = filteredLive > 0 ? (filteredTotal / filteredLive) : 0;
             
-            document.getElementById('total-value').textContent = '£' + Math.round(filteredTotal).toLocaleString();
-            document.getElementById('active-count').textContent = filteredLive;
-            document.getElementById('win-rate').textContent = filteredWinRate + '%';
-            document.getElementById('avg-deal').textContent = '£' + Math.round(filteredAvgDeal).toLocaleString();
+            // Win Rate = Live / Quotations Produced
+            var winRate = quotationCount > 0 ? ((liveProjectCount / quotationCount) * 100).toFixed(1) : 0;
+            
+            // Total Live Value = sum of all projects (regardless of status) in filtered data
+            var totalPipelineValue = 0;
+            filteredData.forEach(function(row) {
+                var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
+                if (value > 0) totalPipelineValue += value;
+            });
+            
+            document.getElementById('total-value').textContent = '£' + Math.round(totalPipelineValue).toLocaleString();
+            document.getElementById('active-count').textContent = liveProjectCount;
+            document.getElementById('win-rate').textContent = winRate + '%';
+            document.getElementById('avg-deal').textContent = '£' + Math.round(totalLiveValue).toLocaleString();
             
             renderProjects();
         }
