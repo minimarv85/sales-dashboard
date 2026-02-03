@@ -445,7 +445,7 @@
             filteredData = csvData.filter(function(row) {
                 var date = row['Date Created'] || '';
                 var rowDate = parseDate(date);
-                var rowDateStr = rowDate ? rowDate.toISOString().split('T')[0] : '';
+                var rowDateStr = rowDate ? rowDate.getFullYear() + '-' + String(rowDate.getMonth() + 1).padStart(2, '0') + '-' + String(rowDate.getDate()).padStart(2, '0') : '';
                 var rowStatus = (row.Status || '').toLowerCase().trim();
                 var rowLeadgen = (row['Lead Generator'] || '').trim();
                 var filterStatus = status.toLowerCase();
