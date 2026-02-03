@@ -233,7 +233,7 @@
     </div>
     
     <script>
-        var csvData = [];
+        var // csvData reset above
         var filteredData = [];
         var displayedCount = 0;
         var pageSize = 10;
@@ -252,6 +252,9 @@
         });
         
         function processFile(file) {
+            console.log('Processing file:', file.name);
+            // Clear previous data first
+            csvData = [];
             var reader = new FileReader();
             reader.onload = function(e) {
                 try {
