@@ -447,8 +447,8 @@ var matchDateTo = !dateTo || !rowDateStr || rowDateStr <= dateTo;<!DOCTYPE html>
                 var filterStatus = status.toLowerCase();
                 var filterLeadgen = leadgen;
                 
-                var matchDateFrom = !dateFrom || !rowDateStr || rowDateStr >= dateFrom;
-                var matchDateTo = !dateTo || rowDateStr <= dateTo;
+                var matchDateFrom = !dateFrom || (rowDateStr && rowDateStr >= dateFrom);
+                var matchDateTo = !dateTo || (rowDateStr && rowDateStr <= dateTo);
                 // Exact match for status filter
                 var matchStatus = !status || rowStatus === status.toLowerCase();
                 var matchLeadgen = !leadgen || rowLeadgen === filterLeadgen;
