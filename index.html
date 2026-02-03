@@ -365,7 +365,7 @@
             var statuses = Object.keys(statusCounts).filter(Boolean).sort();
             var options = '<option value="">All Statuses</option>';
             statuses.forEach(function(s) {
-                options += '<option value="' + s + '">' + s + ' (' + statusCounts[s] + ')</option>';
+                options += '<option data-status="' + s + '">' + s + ' (' + statusCounts[s] + ')</option>';
             });
             select.innerHTML = options;
         }
@@ -430,10 +430,17 @@
             select.innerHTML = options;
         }
         
-        function applyFilters() {
+        
+        function getSelectedStatus() {
+            var select = document.getElementById('status-filter');
+            var option = select.options[select.selectedIndex];
+            return option.getAttribute('data-status') || '';
+        }
+        
+                function applyFilters() {
             var dateFrom = document.getElementById('date-from').value;
             var dateTo = document.getElementById('date-to').value;
-            var status = document.getElementById('status-filter').value;
+            var status = getSelectedStatus();
             var leadgen = document.getElementById('leadgen-filter').value;
             
             filteredData = csvData.filter(function(row) {
