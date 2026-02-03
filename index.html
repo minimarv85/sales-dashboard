@@ -357,10 +357,15 @@
         
         function populateStatusFilter() {
             var select = document.getElementById('status-filter');
-            var statuses = [...new Set(csvData.map(function(r) { return (r.Status || '').trim(); }))].filter(Boolean).sort();
+            var statusCounts = {};
+            csvData.forEach(function(r) {
+                var s = (r.Status || '').trim();
+                statusCounts[s] = (statusCounts[s] || 0) + 1;
+            });
+            var statuses = Object.keys(statusCounts).filter(Boolean).sort();
             var options = '<option value="">All Statuses</option>';
             statuses.forEach(function(s) {
-                options += '<option value="' + s + '">' + s + '</option>';
+                options += '<option value="' + s + '">' + s + ' (' + statusCounts[s] + ')</option>';
             });
             select.innerHTML = options;
         }
@@ -435,13 +440,15 @@
                 var date = row['Date Created'] || '';
                 var rowDate = parseDate(date);
                 var rowDateStr = rowDate ? rowDate.toISOString().split('T')[0] : '';
-                var rowStatus = (row.Status || '').trim();
+                var rowStatus = (row.Status || '').toLowerCase().trim();
                 var rowLeadgen = (row['Lead Generator'] || '').trim();
+                var filterStatus = status.toLowerCase();
+                var filterLeadgen = leadgen;
                 
                 var matchDateFrom = !dateFrom || rowDateStr >= dateFrom;
                 var matchDateTo = !dateTo || rowDateStr <= dateTo;
-                var matchStatus = !status || rowStatus === status || rowStatus.toLowerCase() === status.toLowerCase();
-                var matchLeadgen = !leadgen || rowLeadgen === leadgen;
+                var matchStatus = !status || rowStatus === filterStatus || rowStatus.includes(filterStatus);
+                var matchLeadgen = !leadgen || rowLeadgen === filterLeadgen;
                 var matchSelectedLeadGen = !selectedLeadGen || rowLeadgen === selectedLeadGen;
                 
                 return matchDateFrom && matchDateTo && matchStatus && matchLeadgen && matchSelectedLeadGen;
