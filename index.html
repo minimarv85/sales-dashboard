@@ -454,7 +454,9 @@ var matchDateTo = !dateTo || !rowDateStr || rowDateStr <= dateTo;<!DOCTYPE html>
                 
                 var matchDateFrom = !dateFrom || !rowDateStr || rowDateStr >= dateFrom;
                 var matchDateTo = !dateTo || rowDateStr <= dateTo;
-                var matchStatus = !status || rowStatus.toLowerCase() === filterStatus.toLowerCase();
+                // Match if key words from filter appear in row status
+                var filterWords = status.toLowerCase().split(' ').filter(w => w.length > 3);
+                var matchStatus = !status || filterWords.length === 0 || filterWords.every(w => rowStatus.toLowerCase().includes(w));
                 var matchLeadgen = !leadgen || rowLeadgen === filterLeadgen;
                 var matchSelectedLeadGen = !selectedLeadGen || rowLeadgen === selectedLeadGen;
                 
