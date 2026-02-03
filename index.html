@@ -180,10 +180,6 @@
                 <h3>Total Live Value</h3>
                 <div class="value" id="avg-deal">£0</div>
             </div>
-            <div class="stat">
-                <h3>Enquiries Received</h3>
-                <div class="value" id="enquiry-count">0</div>
-            </div>
         </div>
         
         <div class="charts">
@@ -485,7 +481,6 @@
                 // Quotations count for Win Rate
                 if (rowStatusTrim === 'quotation produced') quotationCount++;
             });
-            var enquiryCount = filteredData.length;
             
             // Win Rate = Live / Quotations Produced
             var winRate = quotationCount > 0 ? ((liveProjectCount / quotationCount) * 100).toFixed(1) : 0;
@@ -501,7 +496,6 @@
             document.getElementById('active-count').textContent = liveProjectCount;
             document.getElementById('win-rate').textContent = winRate + '%';
             document.getElementById('avg-deal').textContent = '£' + Math.round(totalLiveValue).toLocaleString();
-            document.getElementById('enquiry-count').textContent = enquiryCount;
             
             renderProjects();
         }
