@@ -342,14 +342,7 @@ var matchDateTo = !dateTo || !rowDateStr || rowDateStr <= dateTo;<!DOCTYPE html>
             // Win Rate = Live / Quotes Produced
                 var liveCount = csvData.filter(r => (r.Status || '').toLowerCase().includes('live')).length;
                 var quoteCount = csvData.filter(r => (r.Status || '').toLowerCase().includes('quotation')).length;
-                // Stats now calculated in applyFilters based on filtered data
-            
-            document.getElementById('total-value').textContent = '£' + Math.round(totalValue).toLocaleString();
-            document.getElementById('active-count').textContent = activeCount;
-            document.getElementById('win-rate').textContent = winRate + '%';
-            document.getElementById('avg-deal').textContent = '£' + Math.round(avgDeal).toLocaleString();
-            
-            renderBarChart('status-chart', statusData);
+                renderBarChart('status-chart', statusData);
             renderBarChart('leadgen-chart', leadgenData, true);
             renderLeadgenCards(leadgenData);
             populateLeadgenFilter(leadgenData);
