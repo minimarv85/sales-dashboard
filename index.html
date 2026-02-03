@@ -492,7 +492,7 @@ var matchDateTo = !dateTo || !rowDateStr || rowDateStr <= dateTo;<!DOCTYPE html>
                 
                 return '<div class="project-card">' +
                     '<h4>' + (row.Reference || '') + '</h4>' +
-                    '<div class="client">' + (row.Client || '') + '</div>' +
+                    '<div class="client">' + (row.Client || '') + '</div><div class="address" style="font-size: 12px; color: #888; margin-top: 4px;">' + (row['Address Title'] || '') + '</div>' +
                     '<div class="details">' +
                         '<span class="value">' + (value > 0 ? '£' + Math.round(value).toLocaleString() : '-') + '</span>' +
                         '<span class="status ' + statusClass + '">' + status + '</span>' +
