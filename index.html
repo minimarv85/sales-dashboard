@@ -339,7 +339,10 @@ var matchDateTo = !dateTo || !rowDateStr || rowDateStr <= dateTo;<!DOCTYPE html>
                 leadgenData[lg].value += value;
             });
             
-            var winRate = activeCount > 0 ? ((completedCount / activeCount) * 100).toFixed(1) : 0;
+            // Win Rate = Live / Quotes Produced
+                var liveCount = csvData.filter(r => (r.Status || '').toLowerCase().includes('live')).length;
+                var quoteCount = csvData.filter(r => (r.Status || '').toLowerCase().includes('quotation')).length;
+                var winRate = quoteCount > 0 ? ((liveCount / quoteCount) * 100).toFixed(1) : 0;
             var avgDeal = completedCount > 0 ? (totalValue / completedCount) : 0;
             
             document.getElementById('total-value').textContent = '£' + Math.round(totalValue).toLocaleString();
