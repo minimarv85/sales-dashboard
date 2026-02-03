@@ -1,4 +1,4 @@
-var matchDateTo = !dateTo || !rowDateStr || rowDateStr <= dateTo;<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -360,7 +360,7 @@ var matchDateTo = !dateTo || !rowDateStr || rowDateStr <= dateTo;<!DOCTYPE html>
             var statuses = Object.keys(statusCounts).filter(Boolean).sort();
             var options = '<option value="">All Statuses</option>';
             statuses.forEach(function(s) {
-                options += '<option data-status="' + s + '">' + s + ' (' + statusCounts[s] + ')</option>';
+                options += '<option data-status="' + s + '">' + s + '</option>';
             });
             select.innerHTML = options;
         }
