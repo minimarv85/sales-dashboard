@@ -342,8 +342,7 @@ var matchDateTo = !dateTo || !rowDateStr || rowDateStr <= dateTo;<!DOCTYPE html>
             // Win Rate = Live / Quotes Produced
                 var liveCount = csvData.filter(r => (r.Status || '').toLowerCase().includes('live')).length;
                 var quoteCount = csvData.filter(r => (r.Status || '').toLowerCase().includes('quotation')).length;
-                var winRate = quoteCount > 0 ? ((liveCount / quoteCount) * 100).toFixed(1) : 0;
-            var avgDeal = completedCount > 0 ? (totalValue / completedCount) : 0;
+                // Stats now calculated in applyFilters based on filtered data
             
             document.getElementById('total-value').textContent = '£' + Math.round(totalValue).toLocaleString();
             document.getElementById('active-count').textContent = activeCount;
@@ -441,6 +440,25 @@ var matchDateTo = !dateTo || !rowDateStr || rowDateStr <= dateTo;<!DOCTYPE html>
         }
         
                 function applyFilters() {
+            // Calculate stats based on filtered data
+            var filteredTotal = 0;
+            var filteredLive = 0;
+            var filteredQuotes = 0;
+            filteredData.forEach(function(row) {
+                var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
+                var status = (row.Status || '').toLowerCase();
+                if (value > 0) filteredTotal += value;
+                if (status.includes('live')) filteredLive++;
+                if (status.includes('quotation')) filteredQuotes++;
+            });
+            var filteredWinRate = filteredQuotes > 0 ? ((filteredLive / filteredQuotes) * 100).toFixed(1) : 0;
+            var filteredAvgDeal = filteredLive > 0 ? (filteredTotal / filteredLive) : 0;
+            
+            document.getElementById('total-value').textContent = '£' + Math.round(filteredTotal).toLocaleString();
+            document.getElementById('active-count').textContent = filteredLive;
+            document.getElementById('win-rate').textContent = filteredWinRate + '%';
+            document.getElementById('avg-deal').textContent = '£' + Math.round(filteredAvgDeal).toLocaleString();
+            
             var dateFrom = document.getElementById('date-from').value;
             var dateTo = document.getElementById('date-to').value;
             var status = getSelectedStatus();
