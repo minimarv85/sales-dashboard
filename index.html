@@ -180,6 +180,10 @@
                 <h3>Total Live Value</h3>
                 <div class="value" id="avg-deal">£0</div>
             </div>
+            <div class="stat">
+                <h3>Enquiries Received</h3>
+                <div class="value" id="enquiry-count">0</div>
+            </div>
         </div>
         
         <div class="charts">
@@ -464,6 +468,7 @@
             var liveProjectCount = 0;
             var quotationCount = 0;
             var totalPipelineValue = 0;
+            var enquiryCount = 0;
             filteredData.forEach(function(row) {
                 var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
                 var rowStatus = (row.Status || '').toLowerCase();
@@ -479,6 +484,9 @@
                 }
                 // Quotations count for Win Rate
                 if (rowStatusTrim === 'quotation produced') quotationCount++;
+                
+                // Enquiries Received = count of ALL projects in filtered data
+                enquiryCount++;
             });
             
             // Win Rate = Live / Quotations Produced
@@ -495,6 +503,7 @@
             document.getElementById('active-count').textContent = liveProjectCount;
             document.getElementById('win-rate').textContent = winRate + '%';
             document.getElementById('avg-deal').textContent = '£' + Math.round(totalLiveValue).toLocaleString();
+            document.getElementById('enquiry-count').textContent = enquiryCount;
             
             renderProjects();
         }
