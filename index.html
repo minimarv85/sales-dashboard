@@ -454,7 +454,7 @@ var matchDateTo = !dateTo || !rowDateStr || rowDateStr <= dateTo;<!DOCTYPE html>
                 
                 var matchDateFrom = !dateFrom || !rowDateStr || rowDateStr >= dateFrom;
                 var matchDateTo = !dateTo || rowDateStr <= dateTo;
-                var matchStatus = !status || rowStatus === filterStatus || rowStatus.includes(filterStatus) || filterStatus.includes(rowStatus);
+                var matchStatus = !status || rowStatus.toLowerCase() === filterStatus.toLowerCase();
                 var matchLeadgen = !leadgen || rowLeadgen === filterLeadgen;
                 var matchSelectedLeadGen = !selectedLeadGen || rowLeadgen === selectedLeadGen;
                 
