@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Upload</title>
+    <style>
+        body { font-family: Arial; padding: 40px; background: #f5f5f5; }
+        .upload { 
+            border: 3px dashed #ccc; 
+            padding: 60px; 
+            text-align: center; 
+            background: white;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+        .upload:hover { border-color: blue; background: #f0f8ff; }
+        #output { margin-top: 30px; padding: 20px; background: white; border-radius: 12px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>📊 Simple Upload Test</h1>
+    <div class="upload" id="dropzone">
+        <h2>📁 Click or Drop CSV File Here</h2>
+    </div>
+    <input type="file" id="file-input" style="display:none">
+    <div id="output"></div>
+    
+    <script>
+        console.log('Script loaded');
+        
+        var dropzone = document.getElementById('dropzone');
+        var fileInput = document.getElementById('file-input');
+        var output = document.getElementById('output');
+        
+        // Click handler
+        dropzone.addEventListener('click', function() {
+            console.log('Click on dropzone');
+            fileInput.click();
+        });
+        
+        // File input change
+        fileInput.addEventListener('change', function(e) {
+            console.log('File input change triggered');
+            var file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        });
+        
+        // Drag and drop
+        dropzone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            dropzone.style.borderColor = 'blue';
+        });
+        
+        dropzone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            dropzone.style.borderColor = '#ccc';
+        });
+        
+        dropzone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            dropzone.style.borderColor = '#ccc';
+            console.log('Drop event', e.dataTransfer.files.length);
+            var file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+        
+        function handleFile(file) {
+            console.log('Processing file:', file.name);
+            output.innerHTML = '<p class="success">✅ File selected: ' + file.name + ' (' + file.size + ' bytes)</p>';
+            
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var lines = e.target.result.trim().split('\n');
+                output.innerHTML += '<p class="success">✅ Read successfully! ' + lines.length + ' lines found</p>';
+                output.innerHTML += '<p>Headers: ' + lines[0] + '</p>';
+            };
+            reader.onerror = function() {
+                output.innerHTML = '<p class="error">❌ Error reading file</p>';
+            };
+            reader.readAsText(file);
+        }
+        
+        console.log('Setup complete');
+    </script>
+</body>
+</html>
