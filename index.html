@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Pipeline Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
@@ -34,9 +33,6 @@
             background: var(--card);
             border-bottom: 1px solid var(--border);
             padding: 16px 24px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
         }
         
         .header h1 { font-size: 20px; font-weight: 600; }
@@ -44,7 +40,6 @@
         
         .main { max-width: 1400px; margin: 0 auto; padding: 24px; }
         
-        /* Upload Section */
         .upload-zone {
             border: 2px dashed var(--border);
             border-radius: 16px;
@@ -57,7 +52,7 @@
         }
         
         .upload-zone:hover { border-color: var(--primary); background: #EFF6FF; }
-        .upload-zone.dragover { border-color: var(--primary); background: #DBEAFE; }
+        
         .upload-zone span { font-size: 48px; display: block; margin-bottom: 16px; }
         
         .upload-zone h3 { margin-bottom: 8px; }
@@ -65,7 +60,6 @@
         
         #file-input { display: none; }
         
-        /* Dashboard Grid */
         .dashboard { display: none; }
         .dashboard.active { display: block; }
         
@@ -88,9 +82,7 @@
         
         .stat-card h3 { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
         .stat-card .value { font-size: 28px; font-weight: 700; }
-        .stat-card .change { font-size: 13px; margin-top: 4px; }
-        .stat-card .change.up { color: var(--success); }
-        .stat-card .change.down { color: var(--danger); }
+        .stat-card .change { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
         
         .charts-grid {
             display: grid;
@@ -109,9 +101,48 @@
         }
         
         .chart-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
-        .chart-card canvas { max-height: 300px; }
         
-        /* Tables */
+        .simple-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .chart-bar .label {
+            width: 120px;
+            font-size: 13px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .chart-bar .bar-container {
+            flex: 1;
+            height: 24px;
+            background: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .chart-bar .bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .chart-bar .value {
+            width: 80px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
         .table-card {
             background: var(--card);
             border-radius: 16px;
@@ -125,16 +156,16 @@
         
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { font-weight: 600; color: var(--text-secondary); font-size: 13px; text-transform: uppercase; }
+        th { font-weight: 600; color: var(--text-secondary); font-size: 12px; text-transform: uppercase; }
         td { font-size: 14px; }
         tr:hover { background: var(--bg); }
         
-        /* Status Badges */
         .status {
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 500;
+            display: inline-block;
         }
         
         .status.live { background: #D1FAE5; color: #059669; }
@@ -143,7 +174,6 @@
         .status.completed { background: #EDE9FE; color: #7C3AED; }
         .status.lost { background: #FEE2E2; color: #DC2626; }
         
-        /* File Info */
         .file-info {
             display: none;
             align-items: center;
@@ -166,10 +196,8 @@
             cursor: pointer;
         }
         
-        /* Hide sections initially */
         .hidden { display: none !important; }
         
-        /* Filters */
         .filters {
             display: flex;
             gap: 12px;
@@ -186,7 +214,6 @@
         
         .filters input { flex: 1; min-width: 200px; }
         
-        /* Lead Gen Performance */
         .leadgen-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -212,15 +239,13 @@
     </div>
     
     <div class="main">
-        <!-- Upload Section -->
-        <div class="upload-zone" id="upload-zone">
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
             <span>📁</span>
-            <h3>Drop your CSV file here</h3>
-            <p>or click to browse</p>
+            <h3>Click to select CSV file</h3>
+            <p>or drag and drop file here</p>
             <input type="file" id="file-input" accept=".csv">
         </div>
         
-        <!-- File Info -->
         <div class="file-info" id="file-info">
             <div>
                 <div class="name" id="file-name">filename.csv</div>
@@ -229,9 +254,7 @@
             <button onclick="resetDashboard()">Remove</button>
         </div>
         
-        <!-- Dashboard -->
         <div class="dashboard" id="dashboard">
-            <!-- Stats Grid -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <h3>Total Pipeline Value</h3>
@@ -255,33 +278,30 @@
                 </div>
             </div>
             
-            <!-- Charts Grid -->
             <div class="charts-grid">
                 <div class="chart-card">
                     <h3>Pipeline by Status</h3>
-                    <canvas id="statusChart"></canvas>
+                    <div class="simple-chart" id="status-chart"></div>
                 </div>
                 <div class="chart-card">
                     <h3>Value by Lead Generator</h3>
-                    <canvas id="leadgenChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3>Monthly Quote Activity</h3>
-                    <canvas id="timelineChart"></canvas>
+                    <div class="simple-chart" id="leadgen-chart"></div>
                 </div>
                 <div class="chart-card">
                     <h3>Top Clients by Value</h3>
-                    <canvas id="clientChart"></canvas>
+                    <div class="simple-chart" id="client-chart"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Monthly Quote Activity</h3>
+                    <div class="simple-chart" id="timeline-chart"></div>
                 </div>
             </div>
             
-            <!-- Lead Generator Performance -->
             <div class="table-card">
                 <h3>Lead Generator Performance</h3>
                 <div class="leadgen-grid" id="leadgen-performance"></div>
             </div>
             
-            <!-- Pipeline Table -->
             <div class="table-card">
                 <h3>Pipeline Details</h3>
                 <div class="filters">
@@ -318,52 +338,95 @@
     
     <script>
         let csvData = [];
-        let charts = {};
         
         // File Upload Handling
         const uploadZone = document.getElementById('upload-zone');
         const fileInput = document.getElementById('file-input');
         
-        uploadZone.addEventListener('click', () => fileInput.click());
-        uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('dragover');
-            handleFile(e.dataTransfer.files[0]);
+        // Click handler
+        uploadZone.addEventListener('click', function(e) {
+            if (e.target === uploadZone || e.target.tagName === 'H3' || e.target.tagName === 'P' || e.target.parentNode === uploadZone) {
+                fileInput.click();
+            }
         });
-        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        
+        // Drag and drop handlers
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#2563EB';
+            uploadZone.style.background = '#EFF6FF';
+        });
+        
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#E2E8F0';
+            uploadZone.style.background = '#FFFFFF';
+        });
+        
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#E2E8F0';
+            uploadZone.style.background = '#FFFFFF';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        // File input change
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
         
         function handleFile(file) {
-            if (!file || !file.name.endsWith('.csv')) {
+            console.log('File selected:', file.name);
+            
+            if (!file || !file.name.toLowerCase().endsWith('.csv')) {
                 alert('Please upload a CSV file');
                 return;
             }
             
             const reader = new FileReader();
-            reader.onload = (e) => parseCSV(e.target.result);
+            reader.onload = function(e) {
+                console.log('File read successfully');
+                parseCSV(e.target.result);
+            };
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
             reader.readAsText(file);
         }
         
         function parseCSV(text) {
-            const lines = text.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-            
-            csvData = lines.slice(1).map(line => {
-                const values = parseCSVLine(line);
-                const row = {};
-                headers.forEach((h, i) => row[h] = values[i]?.trim().replace(/"/g, '') || '';
-                return row;
-            }).filter(row => row.Reference);
-            
-            // Update file info
-            document.getElementById('file-name').textContent = 'data.csv';
-            document.getElementById('file-size').textContent = `${csvData.length} records`;
-            document.getElementById('file-info').classList.add('active');
-            document.getElementById('upload-zone').classList.add('hidden');
-            document.getElementById('dashboard').classList.add('active');
-            
-            updateDashboard();
+            try {
+                console.log('Parsing CSV...');
+                const lines = text.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+                
+                csvData = lines.slice(1).map(line => {
+                    const values = parseCSVLine(line);
+                    const row = {};
+                    headers.forEach((h, i) => row[h] = (values[i] || '').trim().replace(/^"|"$/g, '');
+                    return row;
+                }).filter(row => row.Reference);
+                
+                console.log('Parsed', csvData.length, 'records');
+                
+                // Update file info
+                document.getElementById('file-name').textContent = 'data.csv';
+                document.getElementById('file-size').textContent = csvData.length + ' records';
+                document.getElementById('file-info').classList.add('active');
+                uploadZone.classList.add('hidden');
+                document.getElementById('dashboard').classList.add('active');
+                
+                updateDashboard();
+            } catch (error) {
+                console.error('Error parsing CSV:', error);
+                alert('Error parsing CSV file: ' + error.message);
+            }
         }
         
         function parseCSVLine(line) {
@@ -371,7 +434,8 @@
             let current = '';
             let inQuotes = false;
             
-            for (let char of line) {
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
                 if (char === '"') {
                     inQuotes = !inQuotes;
                 } else if (char === ',' && !inQuotes) {
@@ -387,74 +451,70 @@
         
         function updateDashboard() {
             // Calculate stats
-            const totalValue = csvData.reduce((sum, row) => {
-                const val = parseFloat(row['Initial Contract Value'] || '0');
-                return sum + (val > 0 ? val : 0);
-            }, 0);
+            let totalValue = 0;
+            let activeCount = 0;
+            let completedCount = 0;
+            let totalCount = 0;
             
-            const activeDeals = csvData.filter(row => 
-                !['Completed', 'Client Lost Lead', 'Lost Lead', 'Declined to Tender', 'Order Cancelled'].includes(row.Status)
-            );
+            const statusBreakdown = {};
+            const leadgenBreakdown = {};
+            const clientBreakdown = {};
+            const monthlyData = {};
             
-            const completedDeals = csvData.filter(row => 
-                row.Status === 'Completed' || row.Status === 'Live'
-            );
+            csvData.forEach(row => {
+                const value = parseFloat(row['Initial Contract Value'] || '0') || 0;
+                const status = row.Status || 'Unknown';
+                const lg = row['Lead Generator'] || 'Unknown';
+                const client = row.Client || 'Unknown';
+                const date = row['Date Created'] || '';
+                const month = date.substring(0, 7);
+                
+                totalValue += value > 0 ? value : 0;
+                
+                // Status tracking
+                if (['Completed', 'Live'].includes(status)) {
+                    completedCount++;
+                }
+                if (!['Completed', 'Client Lost Lead', 'Lost Lead', 'Declined to Tender', 'Order Cancelled'].includes(status)) {
+                    activeCount++;
+                    totalCount++;
+                }
+                
+                // Status breakdown
+                if (!statusBreakdown[status]) statusBreakdown[status] = { count: 0, value: 0 };
+                statusBreakdown[status].count++;
+                statusBreakdown[status].value += value;
+                
+                // Lead gen breakdown
+                if (!leadgenBreakdown[lg]) leadgenBreakdown[lg] = { count: 0, value: 0 };
+                leadgenBreakdown[lg].count++;
+                leadgenBreakdown[lg].value += value;
+                
+                // Client breakdown
+                if (!clientBreakdown[client]) clientBreakdown[client] = 0;
+                clientBreakdown[client] += value;
+                
+                // Monthly data
+                if (month) {
+                    if (!monthlyData[month]) monthlyData[month] = 0;
+                    monthlyData[month]++;
+                }
+            });
             
-            const totalDeals = csvData.filter(row => 
-                row.Status && !['Unable to Tender', 'Declined to Tender'].includes(row.Status)
-            ).length;
-            
-            const winRate = totalDeals > 0 ? ((completedDeals.length / totalDeals) * 100).toFixed(1) : 0;
-            const avgDeal = completedDeals.length > 0 
-                ? (totalValue / completedDeals.length).toFixed(0) 
-                : 0;
+            const winRate = totalCount > 0 ? ((completedCount / totalCount) * 100).toFixed(1) : 0;
+            const avgDeal = completedCount > 0 ? (totalValue / completedCount) : 0;
             
             // Update stat cards
             document.getElementById('total-value').textContent = formatCurrency(totalValue);
-            document.getElementById('active-count').textContent = activeDeals.length;
-            document.getElementById('win-rate').textContent = `${winRate}%`;
+            document.getElementById('active-count').textContent = activeCount;
+            document.getElementById('win-rate').textContent = winRate + '%';
             document.getElementById('avg-deal').textContent = formatCurrency(avgDeal);
             
-            // Status breakdown
-            const statusBreakdown = {};
-            csvData.forEach(row => {
-                const status = row.Status || 'Unknown';
-                const value = parseFloat(row['Initial Contract Value'] || '0');
-                if (!statusBreakdown[status]) {
-                    statusBreakdown[status] = { count: 0, value: 0 };
-                }
-                statusBreakdown[status].count++;
-                statusBreakdown[status].value += value;
-            });
-            
-            // Lead gen breakdown
-            const leadgenBreakdown = {};
-            csvData.forEach(row => {
-                const lg = row['Lead Generator'] || 'Unknown';
-                const value = parseFloat(row['Initial Contract Value'] || '0');
-                if (!leadgenBreakdown[lg]) {
-                    leadgenBreakdown[lg] = { count: 0, value: 0 };
-                }
-                leadgenBreakdown[lg].count++;
-                leadgenBreakdown[lg].value += value;
-            });
-            
-            // Client breakdown
-            const clientBreakdown = {};
-            csvData.forEach(row => {
-                const client = row.Client || 'Unknown';
-                const value = parseFloat(row['Initial Contract Value'] || '0');
-                if (!clientBreakdown[client]) {
-                    clientBreakdown[client] = 0;
-                }
-                clientBreakdown[client] += value;
-            });
-            
-            // Charts
-            createStatusChart(statusBreakdown);
-            createLeadgenChart(leadgenBreakdown);
+            // Create charts
+            createBarChart('status-chart', statusBreakdown, 'count', '#2563EB');
+            createBarChart('leadgen-chart', leadgenBreakdown, 'value', '#10B981');
             createClientChart(clientBreakdown);
-            createTimelineChart();
+            createTimelineChart(monthlyData);
             createLeadgenPerformance(leadgenBreakdown);
             
             // Populate table
@@ -463,132 +523,60 @@
         }
         
         function formatCurrency(val) {
-            return new Intl.NumberFormat('en-GB', { 
-                style: 'currency', 
-                currency: 'GBP',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0 
-            }).format(val);
+            return '£' + Math.round(val).toLocaleString('en-GB');
         }
         
-        function createStatusChart(data) {
-            const ctx = document.getElementById('statusChart').getContext('2d');
-            if (charts.status) charts.status.destroy();
+        function createBarChart(containerId, data, valueKey, color) {
+            const container = document.getElementById(containerId);
+            const entries = Object.entries(data).sort((a, b) => b[1][valueKey] - a[1][valueKey]).slice(0, 8);
+            const max = Math.max(...entries.map(e => e[1][valueKey]));
             
-            const labels = Object.keys(data);
-            const values = labels.map(l => data[l].value);
-            
-            charts.status = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: [
-                            '#2563EB', '#10B981', '#F59E0B', '#EF4444', 
-                            '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    }
-                }
-            });
-        }
-        
-        function createLeadgenChart(data) {
-            const ctx = document.getElementById('leadgenChart').getContext('2d');
-            if (charts.leadgen) charts.leadgen.destroy();
-            
-            const sorted = Object.entries(data)
-                .sort((a, b) => b[1].value - a[1].value)
-                .slice(0, 8);
-            
-            charts.leadgen = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: sorted.map(s => s[0]),
-                    datasets: [{
-                        label: 'Value',
-                        data: sorted.map(s => s[1].value),
-                        backgroundColor: '#2563EB'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    indexAxis: 'y',
-                    plugins: { legend: { display: false } }
-                }
-            });
+            container.innerHTML = entries.map(([label, stats]) => `
+                <div class="chart-bar">
+                    <div class="label" title="${label}">${label}</div>
+                    <div class="bar-container">
+                        <div class="bar" style="width: ${(stats[valueKey] / max * 100)}%; background: ${color}"></div>
+                    </div>
+                    <div class="value">${valueKey === 'value' ? formatCurrency(stats[valueKey]) : stats[valueKey]}</div>
+                </div>
+            `).join('');
         }
         
         function createClientChart(data) {
-            const ctx = document.getElementById('clientChart').getContext('2d');
-            if (charts.client) charts.client.destroy();
+            const container = document.getElementById('client-chart');
+            const entries = Object.entries(data).sort((a, b) => b[1] - a[1]).slice(0, 8);
+            const max = entries[0]?.[1] || 1;
             
-            const sorted = Object.entries(data)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 8);
-            
-            charts.client = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: sorted.map(s => s[0].substring(0, 20)),
-                    datasets: [{
-                        label: 'Value',
-                        data: sorted.map(s => s[1]),
-                        backgroundColor: '#10B981'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } }
-                }
-            });
+            container.innerHTML = entries.map(([label, value]) => `
+                <div class="chart-bar">
+                    <div class="label" title="${label}">${label.substring(0, 20)}</div>
+                    <div class="bar-container">
+                        <div class="bar" style="width: ${(value / max * 100)}%; background: #10B981"></div>
+                    </div>
+                    <div class="value">${formatCurrency(value)}</div>
+                </div>
+            `).join('');
         }
         
-        function createTimelineChart() {
-            const ctx = document.getElementById('timelineChart').getContext('2d');
-            if (charts.timeline) charts.timeline.destroy();
+        function createTimelineChart(data) {
+            const container = document.getElementById('timeline-chart');
+            const entries = Object.entries(data).sort();
+            const max = Math.max(...entries.map(e => e[1]), 1);
             
-            const monthly = {};
-            csvData.forEach(row => {
-                const date = row['Date Created'] || '';
-                const month = date.substring(0, 7);
-                if (month) {
-                    monthly[month] = (monthly[month] || 0) + 1;
-                }
-            });
-            
-            const sorted = Object.entries(monthly).sort();
-            
-            charts.timeline = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: sorted.map(s => s[0]),
-                    datasets: [{
-                        label: 'Quotes Created',
-                        data: sorted.map(s => s[1]),
-                        borderColor: '#8B5CF6',
-                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { legend: { display: false } }
-                }
-            });
+            container.innerHTML = entries.map(([label, value]) => `
+                <div class="chart-bar">
+                    <div class="label">${label}</div>
+                    <div class="bar-container">
+                        <div class="bar" style="width: ${(value / max * 100)}%; background: #8B5CF6"></div>
+                    </div>
+                    <div class="value">${value}</div>
+                </div>
+            `).join('');
         }
         
         function createLeadgenPerformance(data) {
             const container = document.getElementById('leadgen-performance');
-            const sorted = Object.entries(data)
-                .sort((a, b) => b[1].value - a[1].value);
+            const sorted = Object.entries(data).sort((a, b) => b[1].value - a[1].value);
             
             container.innerHTML = sorted.map(([name, stats]) => `
                 <div class="leadgen-card">
@@ -602,19 +590,19 @@
         function populateTable(data) {
             const tbody = document.getElementById('pipeline-table');
             tbody.innerHTML = data.slice(0, 100).map(row => {
-                const value = parseFloat(row['Initial Contract Value'] || '0');
+                const value = parseFloat(row['Initial Contract Value'] || '0') || 0;
                 const statusClass = getStatusClass(row.Status);
-                return `
+                return \`
                     <tr>
-                        <td><strong>${row.Reference || ''}</strong></td>
-                        <td>${row.Client || ''}</td>
-                        <td>${row['Address Title'] || ''}</td>
-                        <td><strong>${value > 0 ? formatCurrency(value) : '-'}</strong></td>
-                        <td><span class="status ${statusClass}">${row.Status || ''}</span></td>
-                        <td>${row['Lead Generator'] || ''}</td>
-                        <td>${row['Date Created'] || ''}</td>
+                        <td><strong>\${row.Reference || ''}</strong></td>
+                        <td>\${row.Client || ''}</td>
+                        <td>\${row['Address Title'] || ''}</td>
+                        <td><strong>\${value > 0 ? formatCurrency(value) : '-'}</strong></td>
+                        <td><span class="status \${statusClass}">\${row.Status || ''}</span></td>
+                        <td>\${row['Lead Generator'] || ''}</td>
+                        <td>\${row['Date Created'] || ''}</td>
                     </tr>
-                `;
+                \`;
             }).join('');
         }
         
@@ -633,7 +621,7 @@
             const leadgens = [...new Set(csvData.map(r => r['Lead Generator'] || ''))].filter(Boolean);
             const select = document.getElementById('leadgen-filter');
             select.innerHTML = '<option value="">All Lead Gens</option>' + 
-                leadgens.map(lg => `<option value="${lg}">${lg}</option>`).join('');
+                leadgens.map(lg => \`<option value="\${lg}">\${lg}</option>\`).join('');
         }
         
         function filterTable() {
@@ -656,9 +644,13 @@
         function resetDashboard() {
             csvData = [];
             document.getElementById('file-info').classList.remove('active');
-            document.getElementById('upload-zone').classList.remove('hidden');
+            uploadZone.classList.remove('hidden');
             document.getElementById('dashboard').classList.remove('active');
             document.getElementById('file-input').value = '';
+            
+            // Reset styles
+            uploadZone.style.borderColor = '#E2E8F0';
+            uploadZone.style.background = '#FFFFFF';
         }
     </script>
 </body>
