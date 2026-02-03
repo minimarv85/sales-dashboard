@@ -208,13 +208,8 @@
                 <input type="date" id="date-to" onchange="applyFilters()">
                 
                 <label>Status:</label>
-                <select id="status-filter" onchange="applyFilters()">
+                <select id="status-filter">
                     <option value="">All Statuses</option>
-                    <option value="Live">Live</option>
-                    <option value="Quotation Produced">Quotation Produced</option>
-                    <option value="Awaiting Quotation">Awaiting Quotation</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Client Lost Lead">Lost Lead</option>
                 </select>
                 
                 <label>Lead Gen:</label>
@@ -356,7 +351,19 @@
             renderBarChart('leadgen-chart', leadgenData, true);
             renderLeadgenCards(leadgenData);
             populateLeadgenFilter(leadgenData);
+            populateStatusFilter();
             applyFilters();
+        }
+        
+        function populateStatusFilter() {
+            var select = document.getElementById('status-filter');
+            var statuses = [...new Set(csvData.map(function(r) { return (r.Status || '').trim(); }))].filter(Boolean).sort();
+            var options = '<option value="">All Statuses</option>';
+            statuses.forEach(function(s) {
+                options += '<option value="' + s + '">' + s + '</option>';
+            });
+            select.innerHTML = options;
+        }
         }
         
         function renderBarChart(containerId, data, isValue) {
@@ -411,8 +418,9 @@
         
         function populateLeadgenFilter(data) {
             var select = document.getElementById('leadgen-filter');
+            var leadgens = [...new Set(csvData.map(function(r) { return (r['Lead Generator'] || '').trim(); }))].filter(Boolean).sort();
             var options = '<option value="">All Lead Gens</option>';
-            Object.keys(data).forEach(function(lg) {
+            leadgens.forEach(function(lg) {
                 options += '<option value="' + lg + '">' + lg + '</option>';
             });
             select.innerHTML = options;
@@ -428,12 +436,14 @@
                 var date = row['Date Created'] || '';
                 var rowDate = parseDate(date);
                 var rowDateStr = rowDate ? rowDate.toISOString().split('T')[0] : '';
+                var rowStatus = (row.Status || '').trim();
+                var rowLeadgen = (row['Lead Generator'] || '').trim();
                 
                 var matchDateFrom = !dateFrom || rowDateStr >= dateFrom;
                 var matchDateTo = !dateTo || rowDateStr <= dateTo;
-                var matchStatus = !status || row.Status === status;
-                var matchLeadgen = !leadgen || row['Lead Generator'] === leadgen;
-                var matchSelectedLeadGen = !selectedLeadGen || row['Lead Generator'] === selectedLeadGen;
+                var matchStatus = !status || rowStatus === status || rowStatus.toLowerCase() === status.toLowerCase();
+                var matchLeadgen = !leadgen || rowLeadgen === leadgen;
+                var matchSelectedLeadGen = !selectedLeadGen || rowLeadgen === selectedLeadGen;
                 
                 return matchDateFrom && matchDateTo && matchStatus && matchLeadgen && matchSelectedLeadGen;
             });
@@ -458,7 +468,7 @@
             container.innerHTML = projects.map(function(row) {
                 var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
                 var statusClass = '';
-                var status = row.Status || '';
+                var status = (row.Status || '').trim();
                 if (status.toLowerCase().includes('live')) statusClass = 'live';
                 else if (status.toLowerCase().includes('quotation')) statusClass = 'quotation';
                 else if (status.toLowerCase().includes('awaiting')) statusClass = 'awaiting';
