@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Dashboard - Test</title>
+    <style>
+        body { font-family: Arial; padding: 40px; background: #f5f5f5; }
+        .upload { 
+            border: 3px dashed #ccc; 
+            padding: 60px; 
+            text-align: center; 
+            background: white;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+        .upload:hover { border-color: blue; background: #f0f8ff; }
+        h1 { color: #333; }
+        p { color: #666; }
+        .btn {
+            background: #2563EB;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .btn:hover { background: #1D4ED8; }
+    </style>
+</head>
+<body>
+    <h1>📊 Sales Pipeline Dashboard</h1>
+    <p>Upload your CSV file to see analytics</p>
+    
+    <div class="upload" onclick="document.getElementById('file').click()">
+        <h3>📁 Click to Select CSV File</h3>
+        <p>or drop file here</p>
+    </div>
+    
+    <input type="file" id="file" accept=".csv" style="display:none" onchange="processFile(this)">
+    
+    <div id="output" style="margin-top: 30px;"></div>
+    
+    <script>
+        function processFile(input) {
+            var file = input.files[0];
+            if (!file) {
+                alert('No file selected');
+                return;
+            }
+            
+            alert('File selected: ' + file.name);
+            
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                alert('File loaded! Processing...');
+                try {
+                    var text = e.target.result;
+                    var lines = text.trim().split('\n');
+                    var headers = lines[0].split(',').map(function(h) { return h.trim().replace(/"/g, ''); });
+                    var count = lines.length - 1;
+                    
+                    document.getElementById('output').innerHTML = 
+                        '<h2>✅ Success!</h2>' +
+                        '<p>File: ' + file.name + '</p>' +
+                        '<p>Records: ' + count + '</p>' +
+                        '<p>Headers: ' + headers.join(', ') + '</p>';
+                } catch (err) {
+                    alert('Error: ' + err.message);
+                }
+            };
+            reader.onerror = function() {
+                alert('Error reading file');
+            };
+            reader.readAsText(file);
+        }
+        
+        // Drag and drop
+        document.body.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        document.body.addEventListener('drop', function(e) {
+            e.preventDefault();
+            var file = e.dataTransfer.files[0];
+            if (file) {
+                document.getElementById('file').files = e.dataTransfer.files;
+                processFile({ files: [file] });
+            }
+        });
+    </script>
+</body>
+</html>
