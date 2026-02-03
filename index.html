@@ -469,7 +469,7 @@
             var liveProjectCount = 0;
             var quotationCount = 0;
             var totalPipelineValue = 0;
-            var enquiryCount = 0;
+            var uniqueEnquiries = new Set();
             filteredData.forEach(function(row) {
                 var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
                 var rowStatus = (row.Status || '').toLowerCase();
@@ -486,9 +486,10 @@
                 // Quotations count for Win Rate
                 if (rowStatusTrim === 'quotation produced') quotationCount++;
                 
-                // Enquiries Received = count of ALL projects in filtered data
-                enquiryCount++;
+                // Enquiries Received = count of UNIQUE WDJN references
+                if (row.Reference) uniqueEnquiries.add(row.Reference);
             });
+            var enquiryCount = uniqueEnquiries.size;
             
             // Win Rate = Live / Quotations Produced
             var winRate = quotationCount > 0 ? ((liveProjectCount / quotationCount) * 100).toFixed(1) : 0;
