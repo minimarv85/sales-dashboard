@@ -253,9 +253,9 @@
                 try {
                     var text = e.target.result;
                     var lines = text.trim().split('\n');
-                    var headers = lines[0].split(',').map(function(h) { 
-                        return h.trim().replace(/^"|"$/g, ''); 
-                    });
+                    
+                    // Define expected headers based on CSV format
+                    var headers = ['Reference', 'Job Type', 'Status', 'Client', 'Address Title', 'Project Quote Value', 'Account Manager', 'Lead Generator', 'Won Date', 'Converted To Project Date', 'Quote Produced Date', 'Quote Due Date', 'Lead Notes', 'Date Created'];
                     
                     csvData = [];
                     for (var i = 1; i < lines.length; i++) {
