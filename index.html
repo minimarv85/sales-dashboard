@@ -254,8 +254,10 @@
                     var text = e.target.result;
                     var lines = text.trim().split('\n');
                     
-                    // Define expected headers based on CSV format
-                    var headers = ['Reference', 'Job Type', 'Status', 'Client', 'Address Title', 'Project Quote Value', 'Account Manager', 'Lead Generator', 'Won Date', 'Converted To Project Date', 'Quote Produced Date', 'Quote Due Date', 'Lead Notes', 'Date Created'];
+                    // Parse headers from first row and clean them
+                    var headers = lines[0].split(',').map(function(h) { 
+                        return h.trim().replace(/^"|"$/g, '').replace(/^"|"$/g, ''); 
+                    });
                     
                     csvData = [];
                     for (var i = 1; i < lines.length; i++) {
@@ -264,7 +266,7 @@
                         for (var j = 0; j < headers.length; j++) {
                             row[headers[j]] = (values[j] || '').trim().replace(/^"|"$/g, '');
                         }
-                        if (row.Reference) csvData.push(row);
+                        if (row.Reference && row.Reference.match(/^WDJN/)) csvData.push(row);
                     }
                     
                     // Sort by date created (newest first) - handle invalid dates
