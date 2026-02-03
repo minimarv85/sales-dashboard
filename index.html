@@ -482,8 +482,8 @@
                 if (value > 0) totalPipelineValue += value;
                 
                 // Total Live Value = sum of LIVE projects ONLY
-                if (rowStatusTrim === 'live' && value > 0) {
-                    totalLiveValue += value;
+                if (rowStatusTrim === 'live') {
+                    if (value > 0) totalLiveValue += value;
                     liveProjectCount++;
                 }
                 // Quotations count for Win Rate
