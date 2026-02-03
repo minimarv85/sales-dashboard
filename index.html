@@ -463,15 +463,22 @@
             var totalLiveValue = 0;
             var liveProjectCount = 0;
             var quotationCount = 0;
+            var totalPipelineValue = 0;
             filteredData.forEach(function(row) {
                 var value = parseFloat(row['Initial Contract Value'] || '0') || 0;
                 var rowStatus = (row.Status || '').toLowerCase();
-                if (value > 0) totalLiveValue += value;
-                if (rowStatus.includes('live')) {
+                var rowStatusTrim = rowStatus.trim();
+                
+                // Total Pipeline Value = sum of ALL projects in filtered data
+                if (value > 0) totalPipelineValue += value;
+                
+                // Total Live Value = sum of LIVE projects ONLY
+                if (rowStatusTrim === 'live' && value > 0) {
+                    totalLiveValue += value;
                     liveProjectCount++;
-                    // Only count Live projects in Live Value
                 }
-                if (rowStatus.includes('quotation')) quotationCount++;
+                // Quotations count for Win Rate
+                if (rowStatusTrim === 'quotation produced') quotationCount++;
             });
             
             // Win Rate = Live / Quotations Produced
