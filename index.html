@@ -272,10 +272,12 @@
                         if (row.Reference) csvData.push(row);
                     }
                     
-                    // Sort by date created (newest first)
+                    // Sort by date created (newest first) - handle invalid dates
                     csvData.sort(function(a, b) {
-                        var dateA = new Date(a['Date Created'] || '01/01/1970');
-                        var dateB = new Date(b['Date Created'] || '01/01/1970');
+                        var dateA = parseDate(a['Date Created']);
+                        var dateB = parseDate(b['Date Created']);
+                        if (!dateA) dateA = new Date('01/01/1970');
+                        if (!dateB) dateB = new Date('01/01/1970');
                         return dateB - dateA;
                     });
                     
@@ -304,6 +306,20 @@
             }
             result.push(current);
             return result;
+        }
+        
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            // Try DD/MM/YYYY format first (UK)
+            var parts = dateStr.split('/');
+            if (parts.length === 3) {
+                var d = new Date(parts[2] + '-' + parts[1] + '-' + parts[0]);
+                if (!isNaN(d.getTime())) return d;
+            }
+            // Try ISO format
+            var iso = new Date(dateStr);
+            if (!isNaN(iso.getTime())) return iso;
+            return null;
         }
         
         function updateDashboard() {
@@ -410,8 +426,8 @@
             
             filteredData = csvData.filter(function(row) {
                 var date = row['Date Created'] || '';
-                var rowDate = date ? new Date(date) : new Date('01/01/1970');
-                var rowDateStr = rowDate.toISOString().split('T')[0];
+                var rowDate = parseDate(date);
+                var rowDateStr = rowDate ? rowDate.toISOString().split('T')[0] : '';
                 
                 var matchDateFrom = !dateFrom || rowDateStr >= dateFrom;
                 var matchDateTo = !dateTo || rowDateStr <= dateTo;
